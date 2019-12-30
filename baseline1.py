@@ -87,7 +87,7 @@ def equalHist_demo(image):
 
 
 # 读取图片
-src = cv.imread('1_0107.jpg')
+src = cv.imread('1_0000.jpg')
 # 缩小图片
 src = cv.resize(src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
 cv.imshow('source', src)

@@ -45,19 +45,33 @@ def line_detect_possible_demo(image, center):
 
     a = np.arctan(angle1[0])
     b = np.arctan(angle1[1])
-    if angle1[0] * angle1[1] > 0:
-        angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+    if a * b < 0 and abs(a) > np.pi / 4:
+       if a + b < 0:
+           angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(
+               math.degrees(-(a + b) / 2) + 180)
+       else:
+           angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(
+               math.degrees(np.pi - (a + b) / 2) + 180)
     else:
-        angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(math.degrees(np.pi - (a + b) / 2) + 180)
+        angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+    print('长指针读数：%f' % angle[0])
+    # print(math.degrees(a - b))
+
+
+
     a = np.arctan(angle2[0])
     b = np.arctan(angle2[1])
-    if angle2[0] * angle2[1] > 0:
-        angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else angle.append(
-            math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+    if a * b < 0 and abs(a) > np.pi / 4:
+       if a + b < 0:
+           angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(
+               math.degrees(-(a + b) / 2) + 180)
+       else:
+           angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else angle.append(
+               math.degrees(np.pi - (a + b) / 2) + 180)
     else:
-        angle.append(math.degrees(-(a + b) / 2)) if res[angle2[1]][1] == 1 else angle.append(
-            math.degrees(2 * np.pi -(a + b) / 2))
-    print(angle)
+        angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+    print('短指针读数：%f' % angle[1])
+    # print(math.degrees(a - b))
 
 
 
@@ -85,8 +99,16 @@ def get_center(mask):
     return center
 
 
+def corner_detect(src, gray):
+    dst = cv.cornerHarris(gray, 3, 27, 0.04)
+    print(dst.shape)  # (400, 600)
+    src[dst > 0.01 * dst.max()] = [0, 255, 255]
+    cv.imshow('corner', src)
+
+
+
 # 读取图片
-src = cv.imread('1_0807.jpg')
+src = cv.imread('1_0107.jpg')
 # 缩小图片
 src = cv.resize(src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
 cv.imshow('source', src)
@@ -109,6 +131,7 @@ mask = cv.bitwise_not(mask)
 cv.imshow('mask', mask)
 center = get_center(mask)
 line_detect_possible_demo(mask, center)
+#corner_detect(src, mask)
 
 
 
