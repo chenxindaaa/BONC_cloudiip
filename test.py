@@ -1,6 +1,7 @@
 import cv2  # 本来想用mpl的，但是cv2功能很强大，就用cv2了
 import matplotlib.pyplot as plt
 import numpy as np
+import math
 
 img = np.zeros((64, 64, 3), np.uint8)  # 生成一个空彩色图像
 
@@ -44,4 +45,4 @@ elif k == ord('s'):
     cv2.destroyAllWindows()
 
 
-print(np.arctan(2))
+print(math.degrees(np.arctan(-1)))
