@@ -14,7 +14,7 @@ class Apparatus:
         res = {}
         edges = cv.Canny(image, 50, 150, apertureSize=5)
         cv.imshow("abcdefg", edges)
-        lines = cv.HoughLinesP(edges, 1, np.pi/180, 13, minLineLength=20, maxLineGap=5)
+        lines = cv.HoughLinesP(edges, 1, np.pi/180, 13, minLineLength=20, maxLineGap=10)
         for line in lines:
             x1, y1, x2, y2 = line[0]
             #k = cv.waitKey(10000)
@@ -46,34 +46,34 @@ class Apparatus:
         angle1 = [i for i in res if res[i][0] == 1]
         angle2 = [i for i in res if res[i][0] == 2]
 
-        a = np.arctan(angle1[0])
-        b = np.arctan(angle1[1])
-        if a * b < 0 and abs(a) > np.pi / 4:
-           if a + b < 0:
-               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-                   math.degrees(-(a + b) / 2) + 180)
-           else:
-               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-                   math.degrees(np.pi - (a + b) / 2) + 180)
-        else:
-            self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
-        print('长指针读数：%f' % self.angle[0])
-        # print(math.degrees(a - b))
-
-
-
-        a = np.arctan(angle2[0])
-        b = np.arctan(angle2[1])
-        if a * b < 0 and abs(a) > np.pi / 4:
-           if a + b < 0:
-               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-                   math.degrees(-(a + b) / 2) + 180)
-           else:
-               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-                   math.degrees(np.pi - (a + b) / 2) + 180)
-        else:
-            self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
-        print('短指针读数：%f' % self.angle[1])
+        # a = np.arctan(angle1[0])
+        # b = np.arctan(angle1[1])
+        # if a * b < 0 and abs(a) > np.pi / 4:
+        #    if a + b < 0:
+        #        self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+        #            math.degrees(-(a + b) / 2) + 180)
+        #    else:
+        #        self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+        #            math.degrees(np.pi - (a + b) / 2) + 180)
+        # else:
+        #     self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+        # print('长指针读数：%f' % self.angle[0])
+        # # print(math.degrees(a - b))
+        #
+        #
+        #
+        # a = np.arctan(angle2[0])
+        # b = np.arctan(angle2[1])
+        # if a * b < 0 and abs(a) > np.pi / 4:
+        #    if a + b < 0:
+        #        self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+        #            math.degrees(-(a + b) / 2) + 180)
+        #    else:
+        #        self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+        #            math.degrees(np.pi - (a + b) / 2) + 180)
+        # else:
+        #     self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+        # print('短指针读数：%f' % self.angle[1])
         # print(math.degrees(a - b))
 
 
@@ -141,7 +141,7 @@ class Apparatus:
 
 
 if __name__ == '__main__':
-    apparatus = Apparatus('1_0305.jpg')
+    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0472.jpg')
     # 读取图片
     apparatus.test()
     k = cv.waitKey(0)

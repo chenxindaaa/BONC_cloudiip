@@ -12,7 +12,7 @@ for i in data:
         apparatus.test()
         f.write(i + '\t长指针读数： %f 短指针读数： %f \n' % (res[0], res[1]))
     except IndexError as reason:
-        f.write(i + str(reason) + '\n')
+        f.write(i + '\t' + str(reason) + '\n')
         continue
 
 
