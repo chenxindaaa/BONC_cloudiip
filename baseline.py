@@ -7,14 +7,15 @@ import math
 
 class Apparatus:
     def __init__(self, name):
+        self.name = name
         self.angle = []
         self.src = cv.imread(name)
 
-    def line_detect_possible_demo(self, image, center):
+    def line_detect_possible_demo(self, image, center, tg):
         res = {}
-        edges = cv.Canny(image, 50, 150, apertureSize=5)
+        edges = cv.Canny(image, 50, 150, apertureSize=7)
         cv.imshow("abcdefg", edges)
-        lines = cv.HoughLinesP(edges, 1, np.pi/180, 13, minLineLength=20, maxLineGap=10)
+        lines = cv.HoughLinesP(edges, 1, np.pi/360, 13, minLineLength=20, maxLineGap=tg)
         for line in lines:
             x1, y1, x2, y2 = line[0]
             #k = cv.waitKey(10000)
@@ -25,7 +26,10 @@ class Apparatus:
             x2 -= center[0]
             y2 = center[1] - y2
             # 计算斜率
-            k = (y2-y1)/(x2-x1)
+            if x2 - x1 == 0:
+                k = float('inf')
+            else:
+                k = (y2-y1)/(x2-x1)
             d1 = np.sqrt(max(abs(x2), abs(x1)) ** 2 + (max(abs(y2), abs(y1))) ** 2)  # 线段长度
             d2 = np.sqrt(min(abs(x2), abs(x1)) ** 2 + (min(abs(y2), abs(y1))) ** 2)
             if d1 < 155 and d1 > 148 and d2 > 115:
@@ -37,43 +41,43 @@ class Apparatus:
             res[k].append(1) if (x2 + x1) /2 > 0 else res[k].append(0)  # 将14象限与23象限分离
             cv.line(self.src, (x1 + center[0], center[1] - y1), (x2 + center[0],  center[1] - y2), (255, 0, 0), 1)
             #t = cv.waitKey(10000)
-            print(x1 + center[0], center[1] - y1, x2 + center[0], center[1] - y2)
+            #print(x1 + center[0], center[1] - y1, x2 + center[0], center[1] - y2)
 
             cv.imshow("line_detect-posssible_demo", self.src)
-            print('k = %f' % k)
-            print('d1 = %f' % d1)
-            print('d2 = %f' % d2)
+            #print('k = %f' % k)
+            #print('d1 = %f' % d1)
+            #print('d2 = %f' % d2)
         angle1 = [i for i in res if res[i][0] == 1]
         angle2 = [i for i in res if res[i][0] == 2]
 
-        # a = np.arctan(angle1[0])
-        # b = np.arctan(angle1[1])
-        # if a * b < 0 and abs(a) > np.pi / 4:
-        #    if a + b < 0:
-        #        self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-        #            math.degrees(-(a + b) / 2) + 180)
-        #    else:
-        #        self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-        #            math.degrees(np.pi - (a + b) / 2) + 180)
-        # else:
-        #     self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
-        # print('长指针读数：%f' % self.angle[0])
-        # # print(math.degrees(a - b))
-        #
-        #
-        #
-        # a = np.arctan(angle2[0])
-        # b = np.arctan(angle2[1])
-        # if a * b < 0 and abs(a) > np.pi / 4:
-        #    if a + b < 0:
-        #        self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-        #            math.degrees(-(a + b) / 2) + 180)
-        #    else:
-        #        self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
-        #            math.degrees(np.pi - (a + b) / 2) + 180)
-        # else:
-        #     self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
-        # print('短指针读数：%f' % self.angle[1])
+        a = np.arctan(angle1[0])
+        b = np.arctan(angle1[1])
+        if a * b < 0 and abs(a) > np.pi / 4:
+           if a + b < 0:
+               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+                   math.degrees(-(a + b) / 2) + 180)
+           else:
+               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+                   math.degrees(np.pi - (a + b) / 2) + 180)
+        else:
+            self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+        print('长指针读数：%f' % self.angle[0])
+        # print(math.degrees(a - b))
+
+
+
+        a = np.arctan(angle2[0])
+        b = np.arctan(angle2[1])
+        if a * b < 0 and abs(a) > np.pi / 4:
+           if a + b < 0:
+               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+                   math.degrees(-(a + b) / 2) + 180)
+           else:
+               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+                   math.degrees(np.pi - (a + b) / 2) + 180)
+        else:
+            self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
+        print('短指针读数：%f' % self.angle[1])
         # print(math.degrees(a - b))
 
 
@@ -121,27 +125,41 @@ class Apparatus:
         cv.imshow('mask', mask)
         return mask
 
+
     def test(self):
         # 缩小图片
         self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
         cv.imshow('source', self.src)
 
+
         # 均值迁移
-        blur = cv.pyrMeanShiftFiltering(self.src, 10, 16)
-        # cv.imshow('blur', blur)
+        blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
 
         # 提取红色
         mask = self.extract(blur)
         center = self.get_center(mask)
-        self.line_detect_possible_demo(mask, center)
-        # corner_detect(src, mask)
+        try:
+            self.line_detect_possible_demo(mask, center, 20)
+        except IndexError:
+            try:
+                self.src = cv.imread(self.name)
+                self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+                self.src = cv.convertScaleAbs(self.src, alpha=1.4, beta=0)
+                blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
+                mask = self.extract(blur)
+                self.line_detect_possible_demo(mask, center, 20)
+            except IndexError:
+                self.src = cv.imread(self.name)
+                self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+                self.src = cv.normalize(self.src, dst=None, alpha=200, beta=10, norm_type=cv.NORM_MINMAX)
 
-
-
+                blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
+                mask = self.extract(blur)
+                self.line_detect_possible_demo(mask, center, 20)
 
 
 if __name__ == '__main__':
-    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0472.jpg')
+    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0475.jpg')
     # 读取图片
     apparatus.test()
     k = cv.waitKey(0)
