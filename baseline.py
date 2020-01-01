@@ -52,7 +52,7 @@ class Apparatus:
 
         a = np.arctan(angle1[0])
         b = np.arctan(angle1[1])
-        if a * b < 0 and abs(a) > np.pi / 4:
+        if a * b < 0 and max(abs(a), abs(b)) > np.pi / 4:
            if a + b < 0:
                self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
                    math.degrees(-(a + b) / 2) + 180)
@@ -68,12 +68,12 @@ class Apparatus:
 
         a = np.arctan(angle2[0])
         b = np.arctan(angle2[1])
-        if a * b < 0 and abs(a) > np.pi / 4:
+        if a * b < 0 and max(abs(a), abs(b)) > np.pi / 4:
            if a + b < 0:
-               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+               self.angle.append(math.degrees(-(a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(
                    math.degrees(-(a + b) / 2) + 180)
            else:
-               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle1[1]][1] == 1 else self.angle.append(
+               self.angle.append(math.degrees(np.pi - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(
                    math.degrees(np.pi - (a + b) / 2) + 180)
         else:
             self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2)) if res[angle2[1]][1] == 1 else self.angle.append(math.degrees(np.pi / 2 - (a + b) / 2) + 180)
@@ -159,7 +159,7 @@ class Apparatus:
 
 
 if __name__ == '__main__':
-    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0475.jpg')
+    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0442.jpg')
     # 读取图片
     apparatus.test()
     k = cv.waitKey(0)
