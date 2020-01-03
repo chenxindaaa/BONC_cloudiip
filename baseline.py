@@ -10,6 +10,14 @@ class Apparatus:
         self.name = name
         self.angle = []
         self.src = cv.imread(name)
+        w, h = self.src.shape[0], self.src.shape[1]
+        c = np.zeros((w, h-w))
+        a = np.identity((self.src.shape[0]))
+        a = np.hstack((a, c))
+        a = a > 0
+        b = self.src[a]
+        cv.imshow('b' , b)
+        print(b)
 
 
     def line_detect_possible_demo(self, image, center, tg):
@@ -123,12 +131,76 @@ class Apparatus:
         # cv.imshow('final', src)
         return center
 
+    def corner_detect(self, gray):
+        """
 
-    def corner_detect(self, src, gray):
-        dst = cv.cornerHarris(gray, 3, 27, 0.04)
-        # print(dst.shape)  # (400, 600)
-        src[dst > 0.01 * dst.max()] = [0, 255, 255]
-        # cv.imshow('corner', src)
+        :param src:
+        :param gray:
+        :return:  返回角点的值
+        """
+        dst = cv.cornerHarris(gray, 11, 27, 0.06)
+
+        w, h = gray.shape
+        gray_copy = np.zeros((w, h))
+        cross = cv.getStructuringElement(cv.MORPH_CROSS, (5, 5))
+        #dst = cv.dilate(dst, cross)
+        cv.imshow('dst', dst)
+
+        if (dst > 0).any():
+            print("PL")
+        self.src[dst > 0.08 * dst.max()] = [0, 255, 255]
+        cv.imshow('src', self.src)
+        return dst
+
+    def find_short(self, center, gray):
+        """
+        :param src:  原图
+        :param center:   指针圆心坐标
+        :param gray: 指针的mask图
+        :return:
+        """
+        dst = self.corner_detect(gray)
+        cv.imshow('dst', dst)
+        cv.imshow('src', self.src)
+        k = cv.waitKey(500)
+
+        w, h, _ = self.src.shape
+        max = 0.12 * dst.max()
+        center_x = center[0]
+        center_y = center[1]
+        petdata = {}
+        petkey = []
+        max_radius = 87
+        min_radius = 81
+        for i in range(w):
+            for j in range(h):
+                distance_center = math.sqrt((i - center_y) ** 2 + (j - center_x) ** 2)  # 距离圆心的距离
+
+                if distance_center < max_radius and distance_center > min_radius:  # 是短指针的角点
+                    if dst[i, j] in petkey:
+                        petdata[dst[i, j]].append((i, j))
+                    else:
+                        petkey.append(dst[i, j])
+                        petdata[dst[i, j]] = []
+                        petdata[dst[i, j]].append((i, j))
+        petkey.sort()
+        petkey = petkey[::-1]
+        print(petkey)
+        data = petdata.get(petkey[2])
+        print(data)
+        sum_x = 0
+        sum_y = 0
+        for i in data:
+            x, y = i
+            sum_x += x
+            sum_y += y
+        x = sum_x // len(data)
+        y = sum_y // len(data)
+        print(x, y)
+        cv.circle(self.src, (y, x), 10, (255, 0, 0), 2)
+        cv.imshow('src', self.src)
+
+
 
     def extract(self, image):
         red_lower1 = np.array([0, 43, 46])
@@ -154,28 +226,30 @@ class Apparatus:
         mask = self.extract(blur)
         # 找圆心
         center = self.get_center(mask)
-        try:
-            self.line_detect_possible_demo(mask, center, 20)
-        except IndexError:
-            try:
-                self.src = cv.imread(self.name)
-                self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
-                self.src = cv.convertScaleAbs(self.src, alpha=1.4, beta=0)
-                blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
-                mask = self.extract(blur)
-                self.line_detect_possible_demo(mask, center, 20)
-            except IndexError:
-                self.src = cv.imread(self.name)
-                self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
-                self.src = cv.normalize(self.src, dst=None, alpha=200, beta=10, norm_type=cv.NORM_MINMAX)
 
-                blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
-                mask = self.extract(blur)
-                self.line_detect_possible_demo(mask, center, 20)
+        self.find_short(center, mask)
+        # try:
+        #     self.line_detect_possible_demo(mask, center, 20)
+        # except IndexError:
+        #     try:
+        #         self.src = cv.imread(self.name)
+        #         self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+        #         self.src = cv.convertScaleAbs(self.src, alpha=1.4, beta=0)
+        #         blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
+        #         mask = self.extract(blur)
+        #         self.line_detect_possible_demo(mask, center, 20)
+        #     except IndexError:
+        #         self.src = cv.imread(self.name)
+        #         self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+        #         self.src = cv.normalize(self.src, dst=None, alpha=200, beta=10, norm_type=cv.NORM_MINMAX)
+        #
+        #         blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
+        #         mask = self.extract(blur)
+        #         self.line_detect_possible_demo(mask, center, 20)
 
 
 if __name__ == '__main__':
-    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0340.jpg')
+    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0000.jpg')
     # 读取图片
     apparatus.test()
     k = cv.waitKey(0)
