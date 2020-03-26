@@ -10,14 +10,6 @@ class Apparatus:
         self.name = name
         self.angle = []
         self.src = cv.imread(name)
-        w, h = self.src.shape[0], self.src.shape[1]
-        c = np.zeros((w, h-w))
-        a = np.identity((self.src.shape[0]))
-        a = np.hstack((a, c))
-        a = a > 0
-        b = self.src[a]
-        cv.imshow('b' , b)
-        print(b)
 
 
     def line_detect_possible_demo(self, image, center, tg):
@@ -128,7 +120,7 @@ class Apparatus:
             center.extend([np.int(x + cx), np.int(y + cy)])
             break
 
-        # cv.imshow('final', src)
+        cv.imshow('center', self.src)
         return center
 
     def corner_detect(self, gray):
@@ -142,8 +134,8 @@ class Apparatus:
 
         w, h = gray.shape
         gray_copy = np.zeros((w, h))
-        cross = cv.getStructuringElement(cv.MORPH_CROSS, (5, 5))
-        #dst = cv.dilate(dst, cross)
+        cross = cv.getStructuringElement(cv.MORPH_CROSS, (7, 7))
+        dst = cv.dilate(dst, cross)
         cv.imshow('dst', dst)
 
         if (dst > 0).any():
@@ -218,18 +210,28 @@ class Apparatus:
 
     def test(self):
         # 缩小图片
-        self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
-        cv.imshow('source', self.src)
-        # 均值迁移
-        blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
-        # 提取红色
-        mask = self.extract(blur)
-        # 找圆心
-        center = self.get_center(mask)
+        # self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+        # cv.imshow('source', self.src)
+        # # 均值迁移
+        # blur = cv.pyrMeanShiftFiltering(self.src, 10, 17)
+        # # 提取红色
+        # mask = self.extract(blur)
+        # # 找圆心
+        # center = self.get_center(mask)
 
-        self.find_short(center, mask)
-        # try:
-        #     self.line_detect_possible_demo(mask, center, 20)
+        self.src = cv.resize(self.src, dsize=None, fx=0.5, fy=0.5)  # 此处可以修改插值方式interpolation
+        mask = self.extract(self.src)
+        mask = cv.medianBlur(mask, ksize=5)  # 去噪
+        # 获取中心
+        center = self.get_center(mask)
+        # 去除多余黑色边框
+        [y, x] = center
+        mask = mask[x - 155:x + 155, y - 155:y + 155]
+        cv.imshow('mask', mask)
+
+        #self.find_short(center, cut)
+        #try:
+        #self.line_detect_possible_demo(mask, center, 20)
         # except IndexError:
         #     try:
         #         self.src = cv.imread(self.name)
@@ -249,7 +251,7 @@ class Apparatus:
 
 
 if __name__ == '__main__':
-    apparatus = Apparatus('./BONC cloudiip工业仪表表盘读数大赛/1_0000.jpg')
+    apparatus = Apparatus('./BONC/1_0555.jpg')
     # 读取图片
     apparatus.test()
     k = cv.waitKey(0)
